@@ -6,5 +6,5 @@ DSPOLED expects the CamillaDSP websocket server to be listening at address **ws:
 ```
 sudo apt-get install -y fonts-open-sans
 make
-./dspoled
+sudo ./dspoled
 ```
