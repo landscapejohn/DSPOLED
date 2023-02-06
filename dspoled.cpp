@@ -202,10 +202,10 @@ int main()
             ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 60, SSD1322_FONT_OPENSANS_LIGHT, 5, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "%.0f", current_volume);
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 120, 62, SSD1322_FONT_OPENSANS_LIGHT, 18, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 120, 62, SSD1322_FONT_OPENSANS_BOLD, 18, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "dB");
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 232, 40, SSD1322_FONT_OPENSANS_LIGHT, 4, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 232, 40, SSD1322_FONT_OPENSANS_BOLD, 4, &bbox);
 
             ssd1306_display_update(oled, volume_framebuffer);
 

@@ -48,22 +48,95 @@ extern "C" {
 #define SSD1322_FONT_DEFAULT SSD1322_FONT_VERA
 #define SSD1322_FONT_MAX SSD1322_FONT_CUSTOM
 
-    typedef enum { // the paths shown here are on Debian-based systems
+    typedef enum {
         // bitstream-vera
-        SSD1322_FONT_VERA = 0,           // /usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf
-        SSD1322_FONT_VERA_BOLD,          // /usr/share/fonts/truetype/ttf-bitstream-vera/VeraBd.ttf
-        SSD1322_FONT_VERA_ITALIC,        // /usr/share/fonts/truetype/ttf-bitstream-vera/VeraIt.ttf
-        SSD1322_FONT_VERA_BOLDITALIC,    // /usr/share/fonts/truetype/ttf-bitstream-vera/VeraBI.ttf
+        SSD1322_FONT_VERA = 0,
+        SSD1322_FONT_VERA_BOLD,
+        SSD1322_FONT_VERA_ITALIC,
+        SSD1322_FONT_VERA_BOLDITALIC,
         // freefont Mono
-        SSD1322_FONT_FREEMONO,           // /usr/share/fonts/truetype/freefont/FreeMono.ttf
-        SSD1322_FONT_FREEMONO_BOLD,      // /usr/share/fonts/truetype/freefont/FreeMonoBold.ttf
-        SSD1322_FONT_FREEMONO_ITALIC,    // /usr/share/fonts/truetype/freefont/FreeMonoOblique.ttf
-        SSD1322_FONT_FREEMONO_BOLDITALIC,// /usr/share/fonts/truetype/freefont/FreeMonoBoldOblique.ttf
-        // additional fonts
-        SSD1322_FONT_OPENSANS_LIGHT,           // /usr/share/fonts/truetype/freefont/FreeSans.ttf
+        SSD1322_FONT_FREEMONO,
+        SSD1322_FONT_FREEMONO_BOLD,
+        SSD1322_FONT_FREEMONO_ITALIC,
+        SSD1322_FONT_FREEMONO_BOLDITALIC,
+        // OpenSans
+        SSD1322_FONT_OPENSANS_LIGHT,
+        SSD1322_FONT_OPENSANS_REGULAR,
+        SSD1322_FONT_OPENSANS_SEMIBOLD,
+        SSD1322_FONT_OPENSANS_BOLD,
+        SSD1322_FONT_OPENSANS_EXTRABOLD,
+        // OpenSans Italic
+        SSD1322_FONT_OPENSANS_LIGHTITALIC,
+        SSD1322_FONT_OPENSANS_ITALIC,
+        SSD1322_FONT_OPENSANS_SEMIBOLDITALIC,
+        SSD1322_FONT_OPENSANS_BOLDITALIC,
+        SSD1322_FONT_OPENSANS_EXTRABOLDITALIC,
+        // OpenSans Condensed
+        SSD1322_FONT_OPENSANS_CONDLIGHT,
+        SSD1322_FONT_OPENSANS_CONDBOLD,
+        SSD1322_FONT_OPENSANS_CONDLIGHTITALIC,
         // last font
         SSD1322_FONT_CUSTOM              // use the ssd1322_graphics_options_t with this
     } ssd1322_fontface_t;
+
+    [[maybe_unused]]
+    static const char *ssd1322_fontface_paths[SSD1322_FONT_MAX + 1] = {
+    "/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf",
+    "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraBd.ttf",
+    "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraIt.ttf",
+    "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraBI.ttf",
+
+    "/usr/share/fonts/truetype/freefont/FreeMono.ttf",
+    "/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf",
+    "/usr/share/fonts/truetype/freefont/FreeMonoOblique.ttf",
+    "/usr/share/fonts/truetype/freefont/FreeMonoBoldOblique.ttf",
+
+    "/usr/share/fonts/truetype/open-sans/OpenSans-Light.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-Semibold.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-Bold.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-ExtraBold.ttf",
+
+    "/usr/share/fonts/truetype/open-sans/OpenSans-LightItalic.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-Italic.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-SemiboldItalic.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-BoldItalic.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-ExtraBoldItalic.ttf",
+
+    "/usr/share/fonts/truetype/open-sans/OpenSans-CondLight.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-CondBold.ttf",
+    "/usr/share/fonts/truetype/open-sans/OpenSans-CondLightItalic.ttf",
+    NULL
+    };
+
+    [[maybe_unused]]
+    static const char *ssd1322_fontface_names[SSD1322_FONT_MAX + 1] = {
+        "SSD1322_FONT_VERA",
+        "SSD1322_FONT_VERA_BOLD",
+        "SSD1322_FONT_VERA_ITALIC",
+        "SSD1322_FONT_VERA_BOLDITALIC",
+        "SSD1322_FONT_FREEMONO",
+        "SSD1322_FONT_FREEMONO_BOLD",
+        "SSD1322_FONT_FREEMONO_ITALIC",
+        "SSD1322_FONT_FREEMONO_BOLDITALIC",
+        // OpenSans
+        "SSD1322_FONT_OPENSANS_LIGHT",
+        "SSD1322_FONT_OPENSANS_REGULAR",
+        "SSD1322_FONT_OPENSANS_SEMIBOLD",
+        "SSD1322_FONT_OPENSANS_BOLD",
+        "SSD1322_FONT_OPENSANS_EXTRABOLD",
+        // OpenSans Italic
+        "SSD1322_FONT_OPENSANS_LIGHTITALIC",
+        "SSD1322_FONT_OPENSANS_ITALIC",
+        "SSD1322_FONT_OPENSANS_SEMIBOLDITALIC",
+        "SSD1322_FONT_OPENSANS_BOLDITALIC",
+        "SSD1322_FONT_OPENSANS_EXTRABOLDITALIC",
+        // OpenSans Condensed
+        "SSD1322_FONT_OPENSANS_CONDLIGHT",
+        "SSD1322_FONT_OPENSANS_CONDBOLD",
+        "SSD1322_FONT_OPENSANS_CONDLIGHTITALIC",
+        "SSD1322_FONT_CUSTOM"
+    };
 
     typedef struct {
         uint16_t width; // width of the framebuffer

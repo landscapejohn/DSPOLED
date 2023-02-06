@@ -90,32 +90,6 @@ typedef void *ssd1322_lock_t;
 #define SSD1322_LOCK_CREATE(A,B) do{} while(0)
 #endif
 
-static const char *ssd1322_fontface_paths[SSD1322_FONT_MAX + 1] = {
-    "/usr/share/fonts/truetype/ttf-bitstream-vera/Vera.ttf",
-    "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraBd.ttf",
-    "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraIt.ttf",
-    "/usr/share/fonts/truetype/ttf-bitstream-vera/VeraBI.ttf",
-    "/usr/share/fonts/truetype/freefont/FreeMono.ttf",
-    "/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf",
-    "/usr/share/fonts/truetype/freefont/FreeMonoOblique.ttf",
-    "/usr/share/fonts/truetype/freefont/FreeMonoBoldOblique.ttf",
-    "/usr/share/fonts/truetype/open-sans/OpenSans-Light.ttf",
-    NULL
-};
-
-static const char *ssd1322_fontface_names[SSD1322_FONT_MAX + 1] = {
-    "SSD1322_FONT_VERA",
-    "SSD1322_FONT_VERA_BOLD",
-    "SSD1322_FONT_VERA_ITALIC",
-    "SSD1322_FONT_VERA_BOLDITALIC",
-    "SSD1322_FONT_FREEMONO",
-    "SSD1322_FONT_FREEMONO_BOLD",
-    "SSD1322_FONT_FREEMONO_ITALIC",
-    "SSD1322_FONT_FREEMONO_BOLDITALIC",
-    "SSD1322_FONT_OPENSANS_LIGHT",
-    "SSD1322_FONT_CUSTOM"
-};
-
 struct ssd1322_font_ {
     FT_Library lib;
     FT_Face faces[SSD1322_FONT_MAX];
