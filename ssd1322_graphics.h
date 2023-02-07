@@ -256,38 +256,6 @@ extern "C" {
         ssd1322_fontface_t fontface, uint8_t font_size,
         const ssd1322_graphics_options_t *opts, size_t num_opts, ssd1322_framebuffer_box_t *bounding_box);
 
-    //These functions are for UTF-32 text. They use libunistring.h
-    //and if you configure the library without libunistring.h then this function
-    //will not be compiled.
-#ifdef LIBSSD1322_HAVE_UNISTR_H
-// this function will check for a string to be well-formed UTF-8.
-// if the string is not a UTF-8 string, it will return an error.
-// Internally it converts the UTF-8 string to a UTF-32 string and prints in
-// UTF-32 mode
-    ssize_t ssd1322_framebuffer_draw_text_utf8(ssd1322_framebuffer_t *fbp,
-        const uint8_t *str, size_t slen,
-        uint8_t x, uint8_t y,
-        ssd1322_fontface_t fontface, uint8_t font_size,
-        const ssd1322_graphics_options_t *opts, size_t num_opts, ssd1322_framebuffer_box_t *bounding_box);
-    // this function will check for a string to be well-formed UTF-16.
-    // if the string is not a UTF-16 string, it will return an error.
-    // Internally it converts the UTF-16 string to a UTF-32 string and prints in
-    // UTF-32 mode
-    ssize_t ssd1322_framebuffer_draw_text_utf16(ssd1322_framebuffer_t *fbp,
-        const uint16_t *str, size_t slen,
-        uint8_t x, uint8_t y,
-        ssd1322_fontface_t fontface, uint8_t font_size,
-        const ssd1322_graphics_options_t *opts, size_t num_opts, ssd1322_framebuffer_box_t *bounding_box);
-    // this function will check for a string to be well-formed UTF-32.
-    // if the string is not a UTF-32 string, it will return an error.
-    ssize_t ssd1322_framebuffer_draw_text_utf32(ssd1322_framebuffer_t *fbp,
-        const uint32_t *str, size_t slen,
-        uint8_t x, uint8_t y,
-        ssd1322_fontface_t fontface, uint8_t font_size,
-        const ssd1322_graphics_options_t *opts, size_t num_opts, ssd1322_framebuffer_box_t *bounding_box);
-#endif
-
-
     // draw a line using Bresenham's line algorithm. returns 0 on success and -1 on
     // failure. if the (x0,y0) or (x1,y1) coordinates are outside the width and
     // height of the screen, the coordinates get clipped automatically
