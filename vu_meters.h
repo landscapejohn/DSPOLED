@@ -111,7 +111,7 @@ extern "C" {
         float center_left,
         float center_right,
         float center_right_right,
-        bool color);
+        char color);
 #ifdef __cplusplus
 }
 #endif

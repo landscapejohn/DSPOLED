@@ -74,6 +74,14 @@ THE SOFTWARE.
 
 ##################
 
+Although Freetype is not directly included in this source code it is required at compile time for linking.
+The below notice applies once Freetype is included:
+
+Portions of this software are copyright © 2021 The FreeType
+    Project (www.freetype.org).  All rights reserved.
+
+##################
+
 All other code and bitmaps in this project
 ------------------------------------------
 The MIT License (MIT)

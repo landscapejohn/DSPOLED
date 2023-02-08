@@ -50,9 +50,9 @@ void draw_linear_meter(ssd1322_framebuffer_t *framebuffer, int left_x, int y)
     int x2 = left_x + 1;
     int x3 = left_x + 2;
 
-    ssd1322_framebuffer_draw_line(framebuffer, left_x, VU_LINEAR_BOTTOM_Y, left_x, y, true);
-    ssd1322_framebuffer_draw_line(framebuffer, x2, VU_LINEAR_BOTTOM_Y, x2, y, true);
-    ssd1322_framebuffer_draw_line(framebuffer, x3, VU_LINEAR_BOTTOM_Y, x3, y, true);
+    ssd1322_framebuffer_draw_line(framebuffer, left_x, VU_LINEAR_BOTTOM_Y, left_x, y, 0xFF);
+    ssd1322_framebuffer_draw_line(framebuffer, x2, VU_LINEAR_BOTTOM_Y, x2, y, 0xFF);
+    ssd1322_framebuffer_draw_line(framebuffer, x3, VU_LINEAR_BOTTOM_Y, x3, y, 0xFF);
 }
 
 /// <summary>
@@ -131,7 +131,7 @@ void draw_vu_meters(ssd1322_framebuffer_t *framebuffer,
     float center_left,
     float center_right,
     float center_right_right,
-    bool color)
+    char color)
 {
     left_level_indicated_index = get_index(left_level_indicated_index, main_left);
     right_level_indicated_index = get_index(right_level_indicated_index, main_right);

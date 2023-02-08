@@ -31,11 +31,11 @@ uint8_t *load_bitmap_to_memory(const char *filename)
     fseek(file, 10, SEEK_SET);
     fread(&bitmap_start_address, 4, 1, file);
 
-    uint8_t *pixel_data = static_cast<uint8_t *>(malloc(2048));
+    uint8_t *pixel_data = static_cast<uint8_t *>(malloc(8192));
     if (pixel_data)
     {
         fseek(file, bitmap_start_address, SEEK_SET);
-        fread(pixel_data, 1, 2048, file);
+        fread(pixel_data, 1, 8192, file);
     }
 
     return pixel_data;
@@ -53,7 +53,7 @@ void display_start_screen(ssd1322_t *oled)
     copy_bitmap_to_framebuffer(logo_pixel_data, start_screen_framebuffer);
     memset(logo_pixel_data, 0, sizeof(*logo_pixel_data));
     ssd1306_display_update(oled, start_screen_framebuffer);
-    sleep(1);
+    sleep(2);
     ssd1322_framebuffer_clear(start_screen_framebuffer);
     ssd1306_display_update(oled, start_screen_framebuffer);
 
@@ -151,12 +151,12 @@ int main()
             else
             {
                 ssd1322_framebuffer_clear(screensaver_framebuffer);
-                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x, screensaver_y, true);
-		        ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x, screensaver_y + 1, true);
-                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 1, screensaver_y, true);
-                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 1, screensaver_y + 1, true);
-                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 2, screensaver_y, true);
-                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 2, screensaver_y + 1, true);
+                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x, screensaver_y, 0xFF);
+		        ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x, screensaver_y + 1, 0xFF);
+                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 1, screensaver_y, 0xFF);
+                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 1, screensaver_y + 1, 0xFF);
+                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 2, screensaver_y, 0xFF);
+                ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x + 2, screensaver_y + 1, 0xFF);
 
                 ssd1306_display_update(oled, screensaver_framebuffer);
                 screensaver_x += screensaver_x_direction;
@@ -193,19 +193,19 @@ int main()
             string current_config_buffer(buf);
 
             snprintf(buf, sizeof(buf) - 1, "%s", current_config_buffer.substr(30, 30).c_str());
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 20, SSD1322_FONT_OPENSANS_LIGHT, 5, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 20, SSD1322_FONT_OPENSANS_LIGHT, 18, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "%s", current_capture_rate.c_str());
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 40, SSD1322_FONT_OPENSANS_LIGHT, 5, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 39, SSD1322_FONT_OPENSANS_LIGHT, 18, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "%s", current_processing_state.c_str());
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 60, SSD1322_FONT_OPENSANS_LIGHT, 5, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 58, SSD1322_FONT_OPENSANS_LIGHT, 18, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "%.0f", current_volume);
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 120, 62, SSD1322_FONT_OPENSANS_BOLD, 18, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 100, 62, SSD1322_FONT_OPENSANS_BOLD, 72, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "dB");
-            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 232, 40, SSD1322_FONT_OPENSANS_BOLD, 4, &bbox);
+            ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 232, 40, SSD1322_FONT_OPENSANS_LIGHT, 14, &bbox);
 
             ssd1306_display_update(oled, volume_framebuffer);
 

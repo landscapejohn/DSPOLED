@@ -203,7 +203,7 @@ extern "C" {
     // degrees or 0 for 0 degrees/360 degrees or any other.
 
     int ssd1322_framebuffer_put_pixel_rotation(ssd1322_framebuffer_t *fbp,
-        uint16_t x, uint16_t y, bool color, uint8_t rotation_flag);
+        uint16_t x, uint16_t y, char color, uint8_t rotation_flag);
 #define ssd1322_framebuffer_put_pixel(fbp,x,y,color) ssd1322_framebuffer_put_pixel_rotation((fbp),(x),(y),(color),0)
 
     // invert the color of the pixel at position (x,y). This is the same as getting
@@ -266,7 +266,7 @@ extern "C" {
     //   V
     //  (63,0)  x ---->    (127,63)
     int ssd1322_framebuffer_draw_line(ssd1322_framebuffer_t *fbp,
-        uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool color);
+        uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color);
 
     // draw a circle using Bresenham's circle drawing algorithm. returns 0 on
     // success and -1 on failure. if parts of the circle lie outside the screen,

@@ -48,6 +48,8 @@ struct ssd1322_font_
 static ssd1322_font_t* ssd1322_font_create(ssd1322_err_t* err);
 static void ssd1322_font_destroy(ssd1322_font_t* font, ssd1322_err_t* err);
 
+
+
 // Utility
 ssd1322_err_t* ssd1322_err_create(FILE* fp)
 {
@@ -197,20 +199,25 @@ int ssd1322_framebuffer_hexdump(ssd1322_framebuffer_t* fbp)
 	for (size_t y = 0; y < fbp->height; ++y)
 	{
 		fprintf(err_fp, "%04zX ", y);
-		uint8_t bit = 0;
-		uint8_t z = 0;
+		bool every_other = false;
+		char combined_char = 0x00;
 		for (size_t x = 0; x < fbp->width; ++x)
 		{
-			char ch = ssd1322_framebuffer_get_pixel(fbp, x, y);
-			if (ch)
-			{ // fill the correct bit
-				z |= (1 << (bit & 7));
-			}
-			if (bit % 8 == 7)
+			combined_char |= ssd1322_framebuffer_get_pixel(fbp, x, y);
+			if (every_other)
 			{
-				fprintf(err_fp, "%02X ", z);
+				if (combined_char)
+				{
+					fprintf(err_fp, "%02X ", combined_char);
+					combined_char = 0x00;
+				}
+				else
+				{
+					fprintf(err_fp, "   ");
+				}
 			}
-			bit++;
+
+			every_other = !every_other;
 		}
 		fprintf(err_fp, "\n");
 	}
@@ -289,7 +296,7 @@ int ssd1322_framebuffer_draw_bricks(ssd1322_framebuffer_t* fbp)
 	return 0;
 }
 
-int ssd1322_framebuffer_put_pixel_rotation(ssd1322_framebuffer_t* fbp, uint16_t x, uint16_t y, bool color, uint8_t rotation_flag)
+int ssd1322_framebuffer_put_pixel_rotation(ssd1322_framebuffer_t* fbp, uint16_t x, uint16_t y, char color, uint8_t rotation_flag)
 {
 	SSD1322_FB_BAD_PTR_RETURN(fbp, -1);
 	uint16_t w = fbp->width;
@@ -323,14 +330,7 @@ int ssd1322_framebuffer_put_pixel_rotation(ssd1322_framebuffer_t* fbp, uint16_t 
 	// SSD1322 handles two 4-bit pixels at a time as one byte.
 	uint8_t mask = x % 2 ? 0x0F : 0xF0;
 
-	if (color)
-	{
-		fbp->buffer[get_buffer_index_from_xy(fbp, x, y)] |= (0xFF & mask);
-	}
-	else
-	{
-		fbp->buffer[get_buffer_index_from_xy(fbp, x, y)] &= ~(0xFF & mask);
-	}
+	fbp->buffer[get_buffer_index_from_xy(fbp, x, y)] |= (color & mask);
 
 	return 0;
 }
@@ -354,7 +354,7 @@ int8_t ssd1322_framebuffer_get_pixel(ssd1322_framebuffer_t* fbp, uint16_t x, uin
 	return fbp->buffer[get_buffer_index_from_xy(fbp, x, y)] & mask;
 }
 
-int ssd1322_framebuffer_draw_line(ssd1322_framebuffer_t* fbp, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool color)
+int ssd1322_framebuffer_draw_line(ssd1322_framebuffer_t* fbp, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color)
 {
 	SSD1322_FB_BAD_PTR_RETURN(fbp, -1);
 
@@ -484,23 +484,23 @@ int ssd1322_framebuffer_draw_line(ssd1322_framebuffer_t* fbp, uint16_t x0, uint1
 	return 0;
 }
 
+/// <summary>
+/// // Copy a 4 bit-per-pixel bitmap to the framebuffer
+/// </summary>
+/// <param name="bitmap"></param>
+/// <param name="framebuffer"></param>
 void copy_bitmap_to_framebuffer(uint8_t* bitmap, ssd1322_framebuffer_t* framebuffer)
 {
 	int x = 255;
 	int y = 0;
-	for (int i = 2047; i > -1; i--)
+	for (int i = 8191; i > -1; i--)
 	{
-		uint8_t eightPixels = bitmap[i];
+		uint8_t twoPixels = bitmap[i];
 
-		for (int j = 0; j < 8; j++)
-		{
-			if (eightPixels & (0x01 << j))
-			{
-				ssd1322_framebuffer_put_pixel(framebuffer, x, y, true);
-			}
-
-			x--;
-		}
+		ssd1322_framebuffer_put_pixel(framebuffer, x, y, (twoPixels));
+		x--;
+		ssd1322_framebuffer_put_pixel(framebuffer, x, y, (twoPixels));
+		x--;
 
 		if (x < 0)
 		{
@@ -509,7 +509,6 @@ void copy_bitmap_to_framebuffer(uint8_t* bitmap, ssd1322_framebuffer_t* framebuf
 		}
 	}
 }
-
 
 
 // Font Rendering
@@ -675,7 +674,7 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 				FT_Matrix transformer = { 0 };
 				FT_Vector pen = { 0 };
 				FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-				ferr = FT_Set_Char_Size(face, 0, font_size * 64, 300, 300);
+				ferr = FT_Set_Char_Size(face, 0, font_size * 64, 0, 85);
 
 				if (ferr)
 				{
@@ -724,7 +723,16 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 					}
 
 
-					ferr = FT_Load_Char(face, cc, FT_LOAD_RENDER); // Load the glyph corresponding to the character cc and render it to the glyph slot in the 'face' object
+					//ferr = FT_Load_Char(face, cc, FT_LOAD_RENDER); // Load the glyph corresponding to the character cc and render it to the glyph slot in the 'face' object
+					
+					FT_UInt  glyph_index;
+					glyph_index = FT_Get_Char_Index(face, cc);
+
+					ferr = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+
+					ferr = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+
+					
 
 					if (ferr)
 					{
@@ -791,7 +799,19 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 							if (i < 0 || j < 0 || i >= fbp->width || j >= fbp->height)
 								continue;
 
-							ssd1322_framebuffer_put_pixel_rotation(fbp, (uint8_t)(i & 0xFF), (uint8_t)(j & 0xFF), bmap->buffer[q * bmap->width + p], rotate_pixel);
+							int normalization = 64;
+							char color = bmap->buffer[q * bmap->pitch + p];
+							if (color > 0)
+							{
+								if (color + normalization > 0xFF)
+									color = 0xFF;
+								else
+									color += normalization;
+							}
+							
+							//color = bmap->buffer[q * bmap->pitch + p] ? 0xFF : 0x00; // no anti-aliasing
+
+							ssd1322_framebuffer_put_pixel_rotation(fbp, (uint8_t)(i & 0xFF), (uint8_t)(j & 0xFF), color, rotate_pixel);
 						}
 					}
 
