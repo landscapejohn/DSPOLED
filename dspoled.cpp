@@ -91,6 +91,8 @@ int main()
     string current_config_name, new_config_name;
     string current_capture_rate, new_capture_rate;
     string current_processing_state, new_processing_state;
+    bool current_muted, new_muted;
+
     float current_volume, new_volume;
 
     display_start_screen(oled);
@@ -113,17 +115,29 @@ int main()
         DspConnector::UpdateState();
         new_processing_state = DspConnector::State;
 
+        DspConnector::UpdateMuted();
+        new_muted = DspConnector::Muted;
+
         if (new_config_name != current_config_name
             || new_capture_rate != current_capture_rate
             || new_volume != current_volume
-            || new_processing_state != current_processing_state)
+            || new_processing_state != current_processing_state
+            || new_muted != current_muted)
         {
+            if (loop_counter > 0)
+            {
+                if (current_processing_state == "Paused")
+                {
+                    display_start_screen(oled);
+                }
+            }
             loop_counter = 0;
 
             current_config_name = new_config_name;
             current_capture_rate = new_capture_rate;
             current_volume = new_volume;
             current_processing_state = new_processing_state;
+            current_muted = new_muted;
         }
 
         DspConnector::UpdateCaptureSignalPeak();
@@ -144,7 +158,7 @@ int main()
         {
             // If nothing has changed in over four seconds then display the VU meters if the system isn't paused, otherwise go into screensaver mode
 
-            if (current_processing_state != "Paused")
+            if (current_processing_state != "Paused" && !current_muted)
             {
                 ssd1306_display_update(oled, vu_framebuffer);
             }
@@ -166,7 +180,7 @@ int main()
                 {
                     screensaver_x_direction = -screensaver_x_direction;
                 }
-                else if (screensaver_x < 2)
+                else if (screensaver_x < 1)
                 {
                     screensaver_x_direction = -screensaver_x_direction;
                 }
@@ -198,7 +212,7 @@ int main()
             snprintf(buf, sizeof(buf) - 1, "%s", current_capture_rate.c_str());
             ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 39, SSD1322_FONT_OPENSANS_LIGHT, 18, &bbox);
 
-            snprintf(buf, sizeof(buf) - 1, "%s", current_processing_state.c_str());
+            snprintf(buf, sizeof(buf) - 1, "%s", current_muted ? "Muted" : current_processing_state.c_str());
             ssd1322_framebuffer_draw_text(volume_framebuffer, buf, 0, 5, 58, SSD1322_FONT_OPENSANS_LIGHT, 18, &bbox);
 
             snprintf(buf, sizeof(buf) - 1, "%.0f", current_volume);
