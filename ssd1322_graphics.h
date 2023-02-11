@@ -268,13 +268,8 @@ extern "C" {
     int ssd1322_framebuffer_draw_line(ssd1322_framebuffer_t *fbp,
         uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, char color);
 
-    // draw a circle using Bresenham's circle drawing algorithm. returns 0 on
-    // success and -1 on failure. if parts of the circle lie outside the screen,
-    // they get clipped automatically. the center of the circle can also lie outside
-    // the screen, and hence we use a larger type for (x,y), and the center can be
-    // negative as well.
-    int ssd1322_framebuffer_draw_circle(ssd1322_framebuffer_t *fbp,
-        int16_t xc, int16_t yc, uint16_t radius);
+    // Draw an anti - aliased line based on Xiaolin Wu's line algorithm (https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm)
+    int ssd1322_framebuffer_draw_aa_line(ssd1322_framebuffer_t* fbp, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool invert);
 
     /// <summary>
     /// Copies a bitmap in memory to the framebuffer for display, 1 bit per pixel

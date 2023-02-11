@@ -126,8 +126,10 @@ int main()
         {
             if (loop_counter > 0)
             {
-                if (current_processing_state == "Paused")
+                if (current_processing_state == "Paused" && new_processing_state != "Paused")
                 {
+                    // Display the start screen when switing from Paused to some other state
+                    ssd1322_set_brightness(oled, 0x0F);
                     display_start_screen(oled);
                 }
             }
@@ -164,6 +166,7 @@ int main()
             }
             else
             {
+                ssd1322_set_brightness(oled, 0x04);
                 ssd1322_framebuffer_clear(screensaver_framebuffer);
                 ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x, screensaver_y, 0xFF);
 		        ssd1322_framebuffer_put_pixel(screensaver_framebuffer, screensaver_x, screensaver_y + 1, 0xFF);
@@ -198,7 +201,6 @@ int main()
         else
         {
             // If any state changes then switch to the data display framebuffer and show the current state
-
             char buf[64] = { 0 };
             ssd1322_framebuffer_box_t bbox;
             ssd1322_framebuffer_clear(volume_framebuffer);

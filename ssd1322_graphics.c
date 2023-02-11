@@ -485,11 +485,78 @@ int ssd1322_framebuffer_draw_line(ssd1322_framebuffer_t* fbp, uint16_t x0, uint1
 }
 
 /// <summary>
+/// Draw an anti-aliased line based on Xiaolin Wu's line algorithm (https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm)
+/// </summary>
+/// <param name="fbp"></param>
+/// <param name="x0"></param>
+/// <param name="y0"></param>
+/// <param name="x1"></param>
+/// <param name="y1"></param>
+/// <param name="invert">true for drawing white on black, false for drawing black on white</param>
+/// <returns></returns>
+int ssd1322_framebuffer_draw_aa_line(ssd1322_framebuffer_t* fbp, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool invert)
+{
+	//SSD1322_FB_BAD_PTR_RETURN(fbp, -1);
+
+	bool steep = abs(y1 - y0) > abs(x1 - x0);
+
+	if (steep)
+	{
+		uint16_t tmp = x0;
+		x0 = y0;
+		y0 = tmp;
+
+		tmp = x1;
+		x1 = y1;
+		y1 = tmp;
+	}
+
+	if (x0 > x1)
+	{
+		uint16_t tmp = x0;
+		x0 = x1;
+		x1 = tmp;
+
+		tmp = y0;
+		y0 = y1;
+		y1 = tmp;
+	}
+
+	float dx = (float)x1 - x0;
+	float dy = (float)y1 - y0;
+	float slope = dx == 0 ? 0 : dy / dx;
+	float y = y0;
+
+	int offset = invert ? 0 : 1;
+
+	for (int x = x0 + 1; x <= x1 - 1; x++)
+	{
+		float y_int;
+		float y_decimal = modff(y, &y_int);
+
+		if (steep)
+		{
+			ssd1322_framebuffer_put_pixel(fbp, (int)y_int + offset, x, (char)((1 - y_decimal) * 16) << 4 | (char)((1 - y_decimal) * 16));
+			ssd1322_framebuffer_put_pixel(fbp, (int)y_int + 1 - offset, x, (char)(y_decimal * 16) << 4 | (char)(y_decimal * 16));
+		}
+		else
+		{
+			ssd1322_framebuffer_put_pixel(fbp, x, (int)y_int + offset, (char)((1 - y_decimal) * 16) << 4 | (char)((1 - y_decimal) * 16));
+			ssd1322_framebuffer_put_pixel(fbp, x, (int)y_int + 1 - offset, (char)(y_decimal * 16) << 4 | (char)(y_decimal * 16));
+		}
+
+		y += slope;
+	}
+
+	return 0;
+}
+
+/// <summary>
 /// // Copy a 4 bit-per-pixel bitmap to the framebuffer
 /// </summary>
 /// <param name="bitmap"></param>
 /// <param name="framebuffer"></param>
-void copy_bitmap_to_framebuffer(uint8_t* bitmap, ssd1322_framebuffer_t* framebuffer)
+void copy_bitmap_to_framebuffer(uint8_t * bitmap, ssd1322_framebuffer_t * framebuffer)
 {
 	int x = 255;
 	int y = 0;
@@ -517,7 +584,7 @@ void copy_bitmap_to_framebuffer(uint8_t* bitmap, ssd1322_framebuffer_t* framebuf
 /// </summary>
 /// <param name="err"></param>
 /// <returns></returns>
-static ssd1322_font_t* ssd1322_font_create(ssd1322_err_t* err)
+static ssd1322_font_t* ssd1322_font_create(ssd1322_err_t * err)
 {
 	FILE* err_fp = SSD1322_ERR_GET_ERRFP(err);
 	ssd1322_font_t* font = calloc(1, sizeof(ssd1322_font_t));
@@ -571,7 +638,7 @@ static ssd1322_font_t* ssd1322_font_create(ssd1322_err_t* err)
 /// </summary>
 /// <param name="font"></param>
 /// <param name="err"></param>
-static void ssd1322_font_destroy(ssd1322_font_t* font, ssd1322_err_t* err)
+static void ssd1322_font_destroy(ssd1322_font_t * font, ssd1322_err_t * err)
 {
 	if (font)
 	{
@@ -617,7 +684,7 @@ static void ssd1322_font_destroy(ssd1322_font_t* font, ssd1322_err_t* err)
 	}
 }
 
-static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* font_file, ssd1322_fontface_t font_idx, uint8_t font_size, const void* str, size_t slen, size_t chsz, uint16_t x, uint16_t y, int16_t rotation_degrees, uint8_t rotate_pixel, ssd1322_framebuffer_box_t* bbox)
+static int ssd1322_font_render_string(ssd1322_framebuffer_t * fbp, const char* font_file, ssd1322_fontface_t font_idx, uint8_t font_size, const void* str, size_t slen, size_t chsz, uint16_t x, uint16_t y, int16_t rotation_degrees, uint8_t rotate_pixel, ssd1322_framebuffer_box_t * bbox)
 {
 	FILE* err_fp = SSD1322_FB_GET_ERRFP(fbp);
 	if (fbp && fbp->font && (font_idx < SSD1322_FONT_MAX || font_file) && str && slen > 0)
@@ -724,7 +791,7 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 
 
 					//ferr = FT_Load_Char(face, cc, FT_LOAD_RENDER); // Load the glyph corresponding to the character cc and render it to the glyph slot in the 'face' object
-					
+
 					FT_UInt  glyph_index;
 					glyph_index = FT_Get_Char_Index(face, cc);
 
@@ -732,7 +799,7 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 
 					ferr = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 
-					
+
 
 					if (ferr)
 					{
@@ -808,7 +875,7 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 								else
 									color += normalization;
 							}
-							
+
 							//color = bmap->buffer[q * bmap->pitch + p] ? 0xFF : 0x00; // no anti-aliasing
 
 							ssd1322_framebuffer_put_pixel_rotation(fbp, (uint8_t)(i & 0xFF), (uint8_t)(j & 0xFF), color, rotate_pixel);
@@ -854,7 +921,7 @@ static int ssd1322_font_render_string(ssd1322_framebuffer_t* fbp, const char* fo
 	return -1;
 }
 
-static void ssd1322_framebuffer_draw_text_options_handler(const ssd1322_graphics_options_t* opts, size_t num_opts, const char** font_file_ptr, uint8_t* rotate_pixel_ptr, int16_t* rotation_degrees_ptr, FILE* err_fp)
+static void ssd1322_framebuffer_draw_text_options_handler(const ssd1322_graphics_options_t * opts, size_t num_opts, const char** font_file_ptr, uint8_t * rotate_pixel_ptr, int16_t * rotation_degrees_ptr, FILE * err_fp)
 {
 	const char* font_file = NULL;
 	uint8_t rotate_pixel = 0;
@@ -904,15 +971,15 @@ static void ssd1322_framebuffer_draw_text_options_handler(const ssd1322_graphics
 
 	if (font_file_ptr)
 		*font_file_ptr = font_file;
-	
+
 	if (rotate_pixel_ptr)
 		*rotate_pixel_ptr = rotate_pixel;
-	
+
 	if (rotation_degrees)
 		*rotation_degrees_ptr = rotation_degrees;
 }
 
-ssize_t ssd1322_framebuffer_draw_text_extra(ssd1322_framebuffer_t* fbp, const char* str, size_t slen, uint16_t x, uint16_t y, ssd1322_fontface_t fontface, uint8_t font_size, const ssd1322_graphics_options_t* opts, size_t num_opts, ssd1322_framebuffer_box_t* bbox)
+ssize_t ssd1322_framebuffer_draw_text_extra(ssd1322_framebuffer_t * fbp, const char* str, size_t slen, uint16_t x, uint16_t y, ssd1322_fontface_t fontface, uint8_t font_size, const ssd1322_graphics_options_t * opts, size_t num_opts, ssd1322_framebuffer_box_t * bbox)
 {
 	FILE* err_fp = SSD1322_FB_GET_ERRFP(fbp);
 
@@ -951,7 +1018,7 @@ ssize_t ssd1322_framebuffer_draw_text_extra(ssd1322_framebuffer_t* fbp, const ch
 	return -1;
 }
 
-ssize_t ssd1322_framebuffer_draw_text(ssd1322_framebuffer_t* fbp, const char* str, size_t slen, uint16_t x, uint16_t y, ssd1322_fontface_t fontface, uint8_t font_size, ssd1322_framebuffer_box_t* bbox)
+ssize_t ssd1322_framebuffer_draw_text(ssd1322_framebuffer_t * fbp, const char* str, size_t slen, uint16_t x, uint16_t y, ssd1322_fontface_t fontface, uint8_t font_size, ssd1322_framebuffer_box_t * bbox)
 {
 	if (fontface < SSD1322_FONT_CUSTOM)
 	{

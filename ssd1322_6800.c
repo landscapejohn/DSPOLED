@@ -362,6 +362,17 @@ const char *ssd1306_version(void)
     return LIBSSD1322_PACKAGE_VERSION;
 }
 
+int ssd1322_set_brightness(ssd1322_t* oled, char brightness)
+{
+    int rc = 0;
+
+    uint8_t data[2];
+    data[0] = brightness;
+    rc |= ssd1322_run_cmd(oled, SSD1322_CMD_MASTER_CONTRAST_CURRENT_CONTROL, data, 1);
+
+    return rc;
+}
+
 int ssd1306_display_initialize(ssd1322_t *oled)
 {
     int rc = 0;

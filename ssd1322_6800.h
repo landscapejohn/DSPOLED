@@ -80,6 +80,8 @@ int ssd1306_display_clear(ssd1322_t *oled);
 
 const char *ssd1306_version(void);
 
+int ssd1322_set_brightness(ssd1322_t* oled, char brightness);
+
 ssd1322_t *ssd1322_6800_open(uint16_t width, uint16_t height, FILE *logerr);
 #ifdef __cplusplus
 }

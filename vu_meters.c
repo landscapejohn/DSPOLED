@@ -144,7 +144,7 @@ void draw_vu_meters(ssd1322_framebuffer_t *framebuffer,
     int vu_center_right_right_index = get_vu_linear_index(center_right_right);
 
     // Left VU meter
-    ssd1322_framebuffer_draw_line(framebuffer,
+    ssd1322_framebuffer_draw_aa_line(framebuffer,
         vu_left_needle_bottom_x[vu_needle_left_index],
         vu_left_needle_bottom_y[vu_needle_left_index],
         vu_left_needle_top_x[vu_needle_left_index],
@@ -152,7 +152,7 @@ void draw_vu_meters(ssd1322_framebuffer_t *framebuffer,
         color);
 
     // Right VU meter, +143 pixels from the left VU meter
-    ssd1322_framebuffer_draw_line(framebuffer,
+    ssd1322_framebuffer_draw_aa_line(framebuffer,
         vu_left_needle_bottom_x[vu_needle_right_index] + 143,
         vu_left_needle_bottom_y[vu_needle_right_index],
         vu_left_needle_top_x[vu_needle_right_index] + 143,
